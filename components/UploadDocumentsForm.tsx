@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import DEFAULT_RETRIEVAL_TEXT from "@/data/DefaultRetrievalText";
+import {FileText} from "lucide-react"
 
 export function UploadDocumentsForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,13 +27,17 @@ export function UploadDocumentsForm() {
     setIsLoading(false);
   };
   return (
-    <form onSubmit={ingest} className="flex w-full mb-4">
-    <textarea
-      className="grow mr-8 p-4 rounded"
-      value={document}
-      onChange={(e) => setDocument(e.target.value)}
-    ></textarea>
-    <button type="submit" className="shrink-0 px-8 py-4 bg-sky-600 rounded w-28">
+    <form onSubmit={ingest} className="flex flex-col w-full flex-1 p-4 gap-2.5 min-w-[200px]">
+    <input type="file" id="document-input" className="sr-only" accept=".pdf,.doc,.docx"/>
+
+    <label htmlFor="document-input w-full">
+      <div className="w-full aspect-video flex flex-col gap-1 items-center justify-center ring-2 ring-white rounded cursor-pointer">
+        <FileText />
+      <span className="text-center text-xs">Faça o upload de um documento</span>
+      </div>
+    </label>
+
+    <button type="submit" className="shrink-0 p-2.5 bg-[#7159c1] rounded w-full hover:brightness-110 transition-all">
       <div role="status" className={`${isLoading ? "" : "hidden"} flex justify-center`}>
         <svg aria-hidden="true" className="w-6 h-6 text-white animate-spin dark:text-white fill-sky-800" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
@@ -40,7 +45,7 @@ export function UploadDocumentsForm() {
         </svg>
         <span className="sr-only">Loading...</span>
       </div>
-      <span className={isLoading ? "hidden" : ""}>Upload</span>
+      <span className={isLoading ? "hidden" : ""}>Enviar</span>
     </button>
   </form>
   );
