@@ -8,10 +8,7 @@ export default function Home() {
     <div className="flex h-full">
       <UploadDocumentsForm></UploadDocumentsForm>
       <ChatWindow
-        endpoint="api/chat"
-        emoji="🏴‍☠️"
-        titleText="Patchy the Chatty Pirate"
-        placeholder="I'm an LLM pretending to be a pirate! Ask me about the pirate life!"
+        endpoint={process.env.NEXT_PUBLIC_API_URL + "/retriveal/stream"}
       ></ChatWindow>
     </div>
 
