@@ -4,7 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { useChat } from "ai/react";
-import { useRef, useState, ReactElement } from "react";
+import { useRef, useState, ReactElement, useEffect } from "react";
 import type { FormEvent } from "react";
 import type { AgentStep } from "langchain/schema";
 
@@ -35,7 +35,18 @@ export function ChatWindow(props: {
 
     setIsLoading(true);
 
-    const tmp = input;
+    if (sessionStorage.getItem("ragChat@sessiorId") === null) {
+      toast("É necessário enviar um arquivo!", {
+        theme: "dark",
+      });
+    }
+
+    if (!input) {
+      setIsLoading(false);
+      return;
+    }
+
+    const tmp = "Me responda isso em português: " + input;
 
     setInput("");
 
@@ -63,9 +74,13 @@ export function ChatWindow(props: {
       //   }),
       // });
 
-      const response = await api.post("/retriveal/stream", {
-        content: tmp,
-      });
+      const response = await api.post(
+        `/retriveal/stream/${sessionStorage.getItem("ragChat@sessiorId")}`,
+        {
+          content: tmp,
+        },
+      );
+
 
       const json = response.data;
 
@@ -97,6 +112,26 @@ export function ChatWindow(props: {
 
     setIsLoading(false);
   };
+
+  // Preciso que quando essa página for fechada o sessionStorage, alertar o usuário que ele perderá os dados
+  // e enviar uma requisição para o servidor para que ele apague os dados do usuário
+  useEffect(() => {
+    window.addEventListener("beforeunload", async (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+
+      const session = sessionStorage.getItem("ragChat@sessiorId");
+
+      if (!session) return;
+      try {
+        api.delete(`/session/${session}`);
+        sessionStorage.removeItem("ragChat@sessiorId");
+        sessionStorage.removeItem("uploadedDocuments");
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  }, []);
 
   // const messageContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -182,7 +217,7 @@ export function ChatWindow(props: {
 
   return (
     <div
-      className={`flex w-full flex-2 flex-col items-center p-4 grow overflow-hidden border-l-2 border-l-white`}
+      className={`flex w-full flex-2 flex-col items-center p-4 grow overflow-hidden md:border-l-2 md:border-l-white`}
     >
       <div className="flex flex-col-reverse w-full mb-4 overflow-auto transition-[flex-grow] ease-in-out grow">
         {messages.length > 0
@@ -206,7 +241,7 @@ export function ChatWindow(props: {
           <input
             className="grow mr-2 p-2.5 rounded outline-none"
             value={input}
-            placeholder={"Ask me a question!"}
+            placeholder={"Me faça uma pergunta!"}
             onChange={handleInputChange}
           />
           <button
